@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Styled Speedometer with Progress Bars and Value</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: space-between; /* Align elements to the left and right */
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* Align text to the left */
+            margin-right: 50px; /* Add some space between the speedometer and text */
+        }
+
+        .text {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar-container {
+            width: 200px;
+            height: 20px;
+            background: #ccc;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px; /* Add some space between progress bar and value text */
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: #3498db;
+        }
+
+        .speedometer {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            border: 10px solid #ccc;
+            border-radius: 50%;
+            background: #f0f0f0;
+            overflow: hidden;
+            transform: rotate(-90deg); /* Rotate to align needle to the right */
+        }
+
+        .needle {
+            position: absolute;
+            width: 2px;
+            height: 100px;
+            background: #000;
+            left: 50%;
+            top: 50%;
+            transform-origin: 50% 100%;
+            transform: translateX(-50%) rotate(0deg);
+            transition: transform 0.5s;
+        }
+
+        .progress-bar {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #3498db;
+            clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+            transform-origin: 50% 100%;
+            transform: rotate(0deg);
+            transition: transform 0.5s;
+        }
+
+        .center-text {
+            font-size: 72px;
+            text-align: center;
+        }
+
+
+    </style>
+</head>
+<body  style="background-color:yellow">
+ <div class="container">
+        <div class="text" style="font-size:70px;color:green;bold:900 " >NOISE LEVEL FROM IOT DEVICE</div>
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill"></div>
+        </div>
+        <div class="center-text" id="jsonValue">Loading...</div>
+    </div>
+    <div class="speedometer">
+        <div class="needle"></div>
+        <div class="progress-bar"></div>
+    </div>
+    <script>
+        fetch('http://127.0.0.1:8000/send_json_data')
+            .then(response => response.json())
+            .then(data => {
+                const value = parseFloat(data.value);
+                const angle = (value / 100) * 180 - 90;
+
+                const needle = document.querySelector('.needle');
+                const progressBar = document.querySelector('.progress-bar');
+
+                needle.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+                progressBar.style.transform = `rotate(${angle}deg)`;
+
+                const progressBarFill = document.querySelector('.progress-bar-fill');
+                progressBarFill.style.width = `${value}%`;
+
+                const centerText = document.getElementById('jsonValue');
+                centerText.textContent = `Value: ${value}`;
+            })
+            .catch(error => console.error('Error:', error));
+    </script>
+</body>
+</html>
